@@ -39,25 +39,24 @@ contract FundMeTest is Test {
         fundMe.fund(); // Sends 0 ETH therefore should revert
     }
 
-    function testFundUpdatesFundedDataStructure() public {
+    modifier funded() {
         vm.prank(USER);
         fundMe.fund{value: FUND_AMOUNT}();
+        _;
+    }
+
+    function testFundUpdatesFundedDataStructure() public funded {
         uint256 amountFunded = fundMe.getAddressToAmountFunded(USER);
         assertEq(amountFunded, FUND_AMOUNT);
     }
 
-    function testFundAddsFunderToArrayOfFunders() public {
-        vm.prank(USER);
-        fundMe.fund{value: FUND_AMOUNT}();
-
+    function testFundAddsFunderToArrayOfFunders() public funded {
         address funder = fundMe.getFunder(0);
 
         assertEq(funder, USER);
     }
 
-    function testOnlyOwnerCanWithdraw() public {
-        vm.prank(USER);
-        fundMe.fund{value: FUND_AMOUNT}();
+    function testOnlyOwnerCanWithdraw() public funded {
         vm.expectRevert();
         vm.prank(USER);
         fundMe.withdraw();
