@@ -33,4 +33,10 @@ contract FundMeTest is Test {
         vm.expectRevert();
         fundMe.fund(); // Sends 0 ETH therefore should revert
     }
+
+    function testFundUpdatesFundedDataStructure() public {
+        fundMe.fund{value: 10e18}();
+        uint256 amountFunded = fundMe.getAddressToAmountFunded(address(this));
+        assertEq(amountFunded, 10e18);
+    }
 }
